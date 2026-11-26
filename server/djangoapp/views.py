@@ -1,19 +1,19 @@
 # Uncomment the required imports before adding the code
 
-# from django.shortcuts import render
-# from django.http import HttpResponseRedirect, HttpResponse
-# from django.contrib.auth.models import User
-# from django.shortcuts import get_object_or_404, render, redirect
-# from django.contrib.auth import logout
-# from django.contrib import messages
-# from datetime import datetime
+from django.shortcuts import render
+from django.http import HttpResponseRedirect, HttpResponse
+from django.contrib.auth.models import User
+from django.shortcuts import get_object_or_404, render, redirect
+from django.contrib.auth import logout
+from django.contrib import messages
+from datetime import datetime
 
 from django.http import JsonResponse
 from django.contrib.auth import login, authenticate
 import logging
 import json
 from django.views.decorators.csrf import csrf_exempt
-# from .populate import initiate
+from .populate import initiate
 
 
 # Get an instance of a logger
@@ -39,13 +39,39 @@ def login_user(request):
     return JsonResponse(data)
 
 # Create a `logout_request` view to handle sign out request
-# def logout_request(request):
-# ...
+def logout_request(request):
+    logout(request)
+    data = {"userName": ""}
+    return JsonResponse(data)
 
 # Create a `registration` view to handle sign up request
-# @csrf_exempt
-# def registration(request):
-# ...
+@csrf_exempt
+def registration(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        username = data['userName']
+        password = data['password']
+        email = data['email']
+        firstName = data['firstName']
+        lastName = data['lastName']
+
+        if User.objects.filter(username=username).exists():
+            return JsonResponse({"error": "Already Registered", "status": False})
+
+        user = User.objects.create_user(
+            username=username,
+            password=password,
+            email=email,
+            first_name=firstName,
+            last_name=lastName
+        )
+        auth_user = authenticate(username=username, password=password)
+        login(request, auth_user)
+        data = {"userName": username, "status": True}
+        return JsonResponse(data)
+    return JsonResponse({"status": False})
+    
+
 
 # # Update the `get_dealerships` view to render the index page with
 # a list of dealerships
