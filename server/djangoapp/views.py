@@ -136,4 +136,4 @@ def add_review(request):
 
 def get_cars(request):
     cars = get_request("/fetchCars")
-    return JsonResponse({"status": 200, "cars": cars})
+    return JsonResponse({"status": 200, "CarModels": cars})
