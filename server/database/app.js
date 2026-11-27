@@ -18,6 +18,8 @@ const Reviews = require('./review');
 
 const Dealerships = require('./dealership');
 
+const Inventory = require('./inventory');
+
 try {
   Reviews.deleteMany({}).then(()=>{
     Reviews.insertMany(reviews_data['reviews']);
@@ -48,6 +50,9 @@ app.get('/fetchReviews', async (req, res) => {
 
 // Express route to fetch reviews by a particular dealer
 app.get('/fetchReviews/dealer/:id', async (req, res) => {
+  const reviews = await Reviews.find({ dealership: Number(req.params.id) });
+  res.json(reviews);
+  return;
   try {
     const documents = await Reviews.find({dealership: req.params.id});
     res.json(documents);
@@ -58,16 +63,23 @@ app.get('/fetchReviews/dealer/:id', async (req, res) => {
 
 // Express route to fetch all dealerships
 app.get('/fetchDealers', async (req, res) => {
+  const dealers = await Dealerships.find();
+  res.json(dealers);
+  return;
 //Write your code here
 });
 
 // Express route to fetch Dealers by a particular state
 app.get('/fetchDealers/:state', async (req, res) => {
-//Write your code here
+  const dealers = await Dealerships.find({ state: req.params.state });
+  res.json(dealers);
 });
 
 // Express route to fetch dealer by a particular id
 app.get('/fetchDealer/:id', async (req, res) => {
+  const dealer = await Dealerships.findOne({ id: Number(req.params.id) });
+  res.json(dealer);
+  return;
 //Write your code here
 });
 
@@ -95,6 +107,16 @@ app.post('/insert_review', express.raw({ type: '*/*' }), async (req, res) => {
   } catch (error) {
 		console.log(error);
     res.status(500).json({ error: 'Error inserting review' });
+  }
+});
+
+// Express route to fetch all cars
+app.get('/fetchCars', async (req, res) => {
+  try {
+    const cars = await Inventory.find();
+    res.json(cars);
+  } catch (error) {
+    res.status(500).json({ error: 'Error fetching cars' });
   }
 });
 

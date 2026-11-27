@@ -113,7 +113,10 @@ def get_dealer_reviews(request, dealer_id):
         endpoint = f"/fetchReviews/dealer/{dealer_id}"
         reviews = get_request(endpoint)
         for review_detail in reviews:
-            sentiments = analyze_review_sentiments(review_detail['review'])
+            try:
+                sentiments = analyze_review_sentiments(review_detail["review"])
+            except:
+                sentiments = {"sentiment": "neutral"}
             review_detail['sentiment'] = sentiments['sentiment']
         return JsonResponse({"status":200,"reviews":reviews})
     else:
@@ -130,3 +133,7 @@ def add_review(request):
             return JsonResponse({"status":401,"message":"Error in posting review"})
     else:
         return JsonResponse({"status":403,"message":"Unauthorized"})
+
+def get_cars(request):
+    cars = get_request("/fetchCars")
+    return JsonResponse({"status": 200, "cars": cars})
